@@ -1,0 +1,11 @@
+secret.txt
+gas.js
+apiurl.txt
+tabid.txt
+*.mjs
+*.png
+!art/*.png
+dbg*
+authurl.txt
+popid.txt
+art/sheet.png
