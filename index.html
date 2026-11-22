@@ -16,14 +16,14 @@
 @font-face{font-family:'Rubik';font-weight:800;font-display:block;src:url('fonts/Rubik-800-hebrew.woff2') format('woff2');unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
 @font-face{font-family:'Rubik';font-weight:800;font-display:block;src:url('fonts/Rubik-800-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122}
 :root{
-  --bg:#FEF6F5; --card:#fff; --pink:#FDE1EA; --pink2:#FBC5D6; --fuchsia:#EF406E; --deep:#B8236B;
-  --mint:#CDEFE2; --mint2:#7CC9B0; --sky:#DDEEFB; --sky2:#9CC4E4; --text:#3A3550; --muted:#7A7592; --line:#F3D3DC;
+  --bg:#F4FBF8; --card:#fff; --pink:#D9F2E8; --pink2:#A9DCCB; --fuchsia:#EF406E; --deep:#1F6B57;
+  --mint:#CDEFE2; --mint2:#7CC9B0; --sky:#DDEEFB; --sky2:#9CC4E4; --text:#3A3550; --muted:#7A7592; --line:#D3EBE1;
   --daniel:#2E6E9E; --eden:#5A9FD0; --afek:#6CCBB0; --guy:#B5E8DA;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;font-family:'Rubik',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:var(--text);line-height:1.5;
-  background:var(--bg) radial-gradient(circle at 12% 8%,#FDE1EA 0,transparent 38%),radial-gradient(circle at 92% 4%,#DDEEFB 0,transparent 34%)}
+  background:var(--bg) radial-gradient(circle at 12% 8%,#CDEFE2 0,transparent 40%),radial-gradient(circle at 92% 4%,#DDEEFB 0,transparent 34%),radial-gradient(circle at 8% 96%,#FDE9F0 0,transparent 30%)}
 .wrap{max-width:760px;margin:0 auto;padding:0 12px 56px}
 header{padding:12px 0 2px;text-align:center}
 .hero{display:flex;align-items:flex-end;justify-content:center;gap:10px}
@@ -50,7 +50,7 @@ h1{margin:0;font-size:30px;font-weight:800;color:var(--deep)}
 .legend img{width:20px;height:20px;object-fit:contain}
 /* nav */
 .nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:8px 0 8px}
-.nav .ar{width:40px;height:40px;border-radius:50%;border:1px solid #E7C9D6;background:rgba(255,255,255,.85);color:var(--deep);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.nav .ar{width:40px;height:40px;border-radius:50%;border:1px solid #BFE3D5;background:rgba(255,255,255,.85);color:var(--deep);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
 .nav .rngw{display:flex;flex-direction:column;align-items:center;gap:0;min-width:130px}
 .nav .tdy{border:0;background:none;padding:2px 6px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);text-decoration:underline;cursor:pointer}
 .nav .rng{font-weight:700;color:var(--deep);min-width:110px;text-align:center;font-size:15px}
@@ -138,7 +138,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:url(art/boy
   <div id="locked" class="lock hide">הדף הזה פרטי. כדי לפתוח אותו צריך להיכנס מהקישור האישי.</div>
 
   <main id="app" class="hide">
-    <div class="box" style="padding:10px 12px">
+    <div class="box hide" style="padding:10px 12px">
       <div class="legend" id="legKids"></div>
       <div class="legend" id="legKinds"></div>
     </div>
