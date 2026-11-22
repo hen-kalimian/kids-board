@@ -69,6 +69,10 @@ h1{margin:0;font-size:30px;font-weight:800;color:var(--deep)}
 .chip img{width:27px;height:27px;object-fit:contain;display:block}
 .more{font-size:11px;font-weight:700;color:var(--muted)}
 .cell .ttl1{font-size:12.5px;line-height:1.15;text-align:center;color:var(--text);max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.cell.multi{padding:0;gap:0;overflow:hidden}
+.cell.multi .dn{position:absolute;top:4px;inset-inline-start:6px;z-index:2;padding-inline-start:0}
+.cell.multi .sec{flex:1 1 0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px;min-height:0}
+.cell.multi .sec.s0{padding-top:26px}
 .cell .ttlm{font-size:10.5px;font-weight:600;line-height:1.1;-webkit-line-clamp:2;text-shadow:0 0 3px #fff,0 0 3px #fff}
 @media (max-width:480px){.cell .ttlm{font-size:9px}}
 @media (max-width:480px){.wrap{padding:0 6px 56px}.cal{gap:3px}.cell{min-height:176px;padding:3px 1px 4px;border-radius:10px}.chip{width:28px;height:28px}.chip img{width:21px;height:21px}.cell .ttl1{font-size:10px;-webkit-line-clamp:3}.dh{font-size:12px}.cell .dn{font-size:13px}}
@@ -329,6 +333,13 @@ function chipBg(e) {
   var step = 100 / ids.length, parts = ids.map(function (id, i) { return KID[id].color + ' ' + (i * step) + '% ' + ((i + 1) * step) + '%'; });
   return 'linear-gradient(90deg,' + parts.join(',') + ')';
 }
+function segBg(e) {
+  var ids = kidIds(e.kids).filter(function (id) { return KID[id]; });
+  if (isAll(kidIds(e.kids)) || !ids.length) return '#8FD9C3';
+  if (ids.length === 1) return KID[ids[0]].color + '99';
+  var step = 100 / ids.length;
+  return 'linear-gradient(90deg,' + ids.map(function (id, i) { return KID[id].color + '99 ' + (i * step) + '% ' + ((i + 1) * step) + '%'; }).join(',') + ')';
+}
 function kidDots(ids) {
   var w = el('span', 'kd'); ids.forEach(function (id) { var i = el('i'); i.style.background = KID[id].color; w.appendChild(i); }); return w;
 }
@@ -350,15 +361,24 @@ function render() {
     else if (d < today) c.className += ' past';
     var st = cellStyle(list); if (st) { c.style.background = st.background; if (st.borderColor) c.style.borderColor = st.borderColor; }
     c.appendChild(el('div', 'dn', d.getDate() + (d.getDate() === 1 || i === 0 ? '.' + (d.getMonth() + 1) : '')));
+    var multi = list.length > 1;
+    if (multi) {
+      c.className += ' multi'; c.style.background = '';
+      list.slice(0, 4).forEach(function (e, si) {
+        var sec = el('div', 'sec' + (si === 0 ? ' s0' : '')); sec.style.background = segBg(e);
+        var b = el('span', 'chip'); b.style.background = chipBg(e);
+        var im = el('img'); im.src = KINDS[e.kind].icon; im.alt = KINDS[e.kind].label; b.appendChild(im);
+        sec.appendChild(b); sec.appendChild(el('div', 'ttl1 ttlm', e.title)); c.appendChild(sec);
+      });
+      if (list.length > 4) c.appendChild(el('div', 'more', '+' + (list.length - 4)));
+    }
     var ch = el('div', 'chips');
-    list.slice(0, 4).forEach(function (e) {
+    if (!multi) list.slice(0, 4).forEach(function (e) {
       var b = el('span', 'chip'); b.style.background = chipBg(e);
       var im = el('img'); im.src = KINDS[e.kind].icon; im.alt = KINDS[e.kind].label; b.appendChild(im); ch.appendChild(b);
     });
-    c.appendChild(ch);
-    if (list.length > 4) c.appendChild(el('div', 'more', '+' + (list.length - 4)));
-    else if (list.length === 1) c.appendChild(el('div', 'ttl1', list[0].title));
-    if (list.length > 1) { list.slice(0, 4).forEach(function (e) { c.appendChild(el('div', 'ttl1 ttlm', e.title)).style.webkitLineClamp = list.length > 2 ? '1' : '2'; }); }
+    if (!multi) c.appendChild(ch);
+    if (list.length === 1) c.appendChild(el('div', 'ttl1', list[0].title));
     c.setAttribute('aria-label', 'יום ' + d.getDate() + '.' + (d.getMonth() + 1) + ', ' + list.length + ' אירועים');
     (function (dd, ll) { c.addEventListener('click', function () { if (ll.length === 1) openEvent(ll[0]); else if (ll.length) openDay(dd, ll); else openAddFor(dd); }); })(d, list);
     cal.appendChild(c);
