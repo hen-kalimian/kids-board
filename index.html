@@ -301,7 +301,20 @@ function cellStyle(evs) {
   var allShared = evs.some(function (e) { return isAll(kidIds(e.kids)); });
   var uniq = sets.filter(function (s, i) { return sets.indexOf(s) === i; });
   if (allShared && uniq.length === 1) return { background: MINT_GRAD };
+  // (אירוע משותף יחד עם אירוע של ילד אחד נופל לחלוקה למטה)
+  if (allShared && uniq.length > 1) { /* ממשיכים לחלוקה */ }
   if (uniq.length === 1) { var ids = uniq[0].split(','); if (ids.length === 1 && KID[ids[0]]) return { background: KID[ids[0]].tint, borderColor: KID[ids[0]].color }; }
+  // כמה אירועים של ילדים שונים באותו יום: כל חלק מהמשבצת צבוע בצבע של הילד
+  var segs = [];
+  evs.forEach(function (e) {
+    var ids = kidIds(e.kids);
+    var cols = isAll(ids) ? ['#8FD9C3'] : ids.filter(function (id) { return KID[id]; }).map(function (id) { return KID[id].color + '99'; });
+    cols.forEach(function (c) { if (segs.indexOf(c) < 0) segs.push(c); });
+  });
+  if (segs.length > 1) {
+    var step = 100 / segs.length;
+    return { background: 'linear-gradient(180deg,' + segs.map(function (c, i) { return c + ' ' + (i * step) + '% ' + ((i + 1) * step) + '%'; }).join(',') + ')' };
+  }
   if (allShared) return { background: MINT_GRAD };
   return '';
 }
