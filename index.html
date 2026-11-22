@@ -73,7 +73,7 @@ h1{margin:0;font-size:30px;font-weight:800;color:var(--deep)}
 .cell.multi .dn{position:absolute;top:4px;inset-inline-start:6px;z-index:2;padding-inline-start:0}
 .cell.multi .sec{flex:1 1 0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px;min-height:0}
 .cell.multi .sec.s0{padding-top:26px}
-.cell .ttlm{font-size:10.5px;font-weight:600;line-height:1.1;-webkit-line-clamp:2;text-shadow:0 0 3px #fff,0 0 3px #fff}
+.cell .ttlm{font-size:10.5px;font-weight:600;line-height:1.1;-webkit-line-clamp:3;text-shadow:0 0 3px #fff,0 0 3px #fff}
 @media (max-width:480px){.cell .ttlm{font-size:9px}}
 @media (max-width:480px){.wrap{padding:0 6px 56px}.cal{gap:3px}.cell{min-height:176px;padding:3px 1px 4px;border-radius:10px}.chip{width:28px;height:28px}.chip img{width:21px;height:21px}.cell .ttl1{font-size:10px;-webkit-line-clamp:3}.dh{font-size:12px}.cell .dn{font-size:13px}}
 /* agenda */
@@ -254,7 +254,7 @@ function waze(q) { return 'https://waze.com/ul?q=' + encodeURIComponent(q) + '&n
 function gcal(it) {
   var s = startOf(it), e = new Date(s.getTime() + 2 * 3600e3), f = function (d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00'; };
   var dates = it.time ? f(s) + '/' + f(e) : f(s).slice(0, 8) + '/' + f(new Date(s.getTime() + 86400e3)).slice(0, 8);
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(it.title) + '&dates=' + dates + '&ctz=Asia/Jerusalem&location=' + encodeURIComponent(it.place || '') + '&details=' + encodeURIComponent(it.details || '');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(dt(it)) + '&dates=' + dates + '&ctz=Asia/Jerusalem&location=' + encodeURIComponent(it.place || '') + '&details=' + encodeURIComponent(it.details || '');
 }
 
 // ---- אירועי כיתה א׳1 (אותה לוגיקה כמו בדף הכיתה) ----
@@ -343,6 +343,7 @@ function segBg(e) {
 function kidDots(ids) {
   var w = el('span', 'kd'); ids.forEach(function (id) { var i = el('i'); i.style.background = KID[id].color; w.appendChild(i); }); return w;
 }
+function dt(e) { var ids = kidIds(e.kids); if (!ids.length || e.title.indexOf('(') >= 0) return e.title; return e.title + ' (' + (isAll(ids) ? 'כולם' : kidNames(ids)) + ')'; }
 function kidNames(ids) { return isAll(ids) ? 'כל הילדים' : ids.map(function (id) { return KID[id].name; }).join(' ו'); }
 function byDay(evs) { var m = {}; evs.forEach(function (e) { (m[e.date] = m[e.date] || []).push(e); }); Object.keys(m).forEach(function (k) { m[k].sort(function (a, b) { return (a.time || '99').localeCompare(b.time || '99'); }); }); return m; }
 
@@ -363,12 +364,12 @@ function render() {
     c.appendChild(el('div', 'dn', d.getDate() + (d.getDate() === 1 || i === 0 ? '.' + (d.getMonth() + 1) : '')));
     var multi = list.length > 1;
     if (multi) {
-      c.className += ' multi'; c.style.background = '';
+      c.className += ' multi'; c.style.background = ''; if (list.length >= 3) c.style.minHeight = (list.length >= 4 ? 310 : 250) + 'px';
       list.slice(0, 4).forEach(function (e, si) {
         var sec = el('div', 'sec' + (si === 0 ? ' s0' : '')); sec.style.background = segBg(e);
         var b = el('span', 'chip'); b.style.background = chipBg(e);
         var im = el('img'); im.src = KINDS[e.kind].icon; im.alt = KINDS[e.kind].label; b.appendChild(im);
-        sec.appendChild(b); sec.appendChild(el('div', 'ttl1 ttlm', e.title)); c.appendChild(sec);
+        sec.appendChild(b); sec.appendChild(el('div', 'ttl1 ttlm', dt(e))); c.appendChild(sec);
       });
       if (list.length > 4) c.appendChild(el('div', 'more', '+' + (list.length - 4)));
     }
@@ -378,7 +379,7 @@ function render() {
       var im = el('img'); im.src = KINDS[e.kind].icon; im.alt = KINDS[e.kind].label; b.appendChild(im); ch.appendChild(b);
     });
     if (!multi) c.appendChild(ch);
-    if (list.length === 1) c.appendChild(el('div', 'ttl1', list[0].title));
+    if (list.length === 1) c.appendChild(el('div', 'ttl1', dt(list[0])));
     c.setAttribute('aria-label', 'יום ' + d.getDate() + '.' + (d.getMonth() + 1) + ', ' + list.length + ' אירועים');
     (function (dd, ll) { c.addEventListener('click', function () { if (ll.length === 1) openEvent(ll[0]); else if (ll.length) openDay(dd, ll); else openAddFor(dd); }); })(d, list);
     cal.appendChild(c);
@@ -392,7 +393,7 @@ function render() {
     var ids = kidIds(e.kids), b = el('button', 'card'); b.type = 'button';
     var bar = el('span', 'bar'); bar.style.background = chipBg(e); b.appendChild(bar);
     var im = el('img'); im.src = KINDS[e.kind].icon; im.alt = ''; b.appendChild(im);
-    var tx = el('div', 'tx'); tx.appendChild(el('div', 'who', e.title));
+    var tx = el('div', 'tx'); tx.appendChild(el('div', 'who', dt(e)));
     tx.appendChild(el('div', 'when', whenText(e)));
     var meta = el('div', 'meta'); meta.appendChild(kidDots(ids)); meta.appendChild(document.createTextNode(kidNames(ids) + ' · ' + KINDS[e.kind].label)); tx.appendChild(meta);
     b.appendChild(tx);
@@ -417,7 +418,7 @@ function openDay(d, list) {
     var ids = kidIds(e.kids), b = el('button', 'card'); b.type = 'button';
     var bar = el('span', 'bar'); bar.style.background = chipBg(e); b.appendChild(bar);
     var im = el('img'); im.src = KINDS[e.kind].icon; im.alt = ''; b.appendChild(im);
-    var tx = el('div', 'tx'); tx.appendChild(el('div', 'who', e.title));
+    var tx = el('div', 'tx'); tx.appendChild(el('div', 'who', dt(e)));
     var meta = el('div', 'meta'); meta.appendChild(kidDots(ids)); meta.appendChild(document.createTextNode(kidNames(ids) + (e.time ? ' · ' + e.time : ''))); tx.appendChild(meta);
     b.appendChild(tx); b.addEventListener('click', function () { openEvent(e); }); w.appendChild(b);
   });
@@ -429,7 +430,7 @@ function openDay(d, list) {
 function openEvent(e) {
   var ids = kidIds(e.kids), nodes = [];
   var im = el('img', 'big'); im.src = KINDS[e.kind].icon; im.alt = ''; nodes.push(im);
-  var h = el('h3', null, e.title); h.style.textAlign = 'center'; nodes.push(h);
+  var h = el('h3', null, dt(e)); h.style.textAlign = 'center'; nodes.push(h);
   var ks = el('div', 'kids');
   (isAll(ids) ? [{ n: 'כל הילדים', bg: MINT_GRAD, fg: '#1F5E4B' }] : ids.map(function (id) { return { n: KID[id].name, bg: KID[id].color, fg: id === 'guy' || id === 'afek' ? '#1F4C40' : '#fff' }; })).forEach(function (x) {
     var p = el('span', 'pill', x.n); p.style.background = x.bg; p.style.color = x.fg; ks.appendChild(p);
